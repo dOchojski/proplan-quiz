@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+<title>PRO PLAN LiveClear Quiz</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+
+  :root{
+    --gold:#c9a84c;--gold-l:#e2c97e;--gold-d:#a8872e;
+    --beige:#d4bc7b;--beige-bg:rgba(212,188,123,0.92);
+    --dark:#0a0a0a;--card:rgba(30,30,30,0.85);--card-b:rgba(160,140,80,0.45);
+    --white:#fff;--gray:#888;--gray-l:#aaa;
+  }
+
+  html,body{
+    width:100%;height:100vh;overflow:hidden;
+    font-family:'Montserrat','Roboto','Segoe UI',system-ui,-apple-system,sans-serif;
+    background:#000;color:var(--white);
+    touch-action:manipulation;
+    position:fixed;top:0;left:0;right:0;bottom:0;
+  }
+  @supports(height:100dvh){html,body{height:100dvh}}
+
+  .app{
+    width:100%;height:100%;
+    margin:0 auto;position:relative;overflow:hidden;
+    background:#000;max-width:calc(100vh * 9 / 16);
+  }
+  @supports(height:100dvh){.app{max-width:calc(100dvh * 9 / 16)}}
+
+  .screen{
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    display:flex;flex-direction:column;
+    visibility:hidden;opacity:0;transition:opacity 0.4s ease;
+    overflow:hidden;z-index:1;
+  }
+  .screen.active{visibility:visible;opacity:1;z-index:2}
+  .screen.leaving{visibility:visible;opacity:0;z-index:1}
+
+  #introScreen{background:#000;align-items:center;justify-content:center}
+  .intro-video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;background:#000}
+  .tap-overlay{
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    z-index:8;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:16px;
+    background:rgba(0,0,0,0.7);cursor:pointer;
+  }
+  .tap-overlay.hidden{display:none}
+  .tap-play-icon{
+    width:80px;height:80px;border-radius:50%;
+    border:3px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    animation:pulse 1.8s infinite ease-in-out;
+  }
+  .tap-play-icon::after{
+    content:'';display:block;width:0;height:0;
+    border-top:18px solid transparent;border-bottom:18px solid transparent;
+    border-left:28px solid var(--gold);margin-left:6px;
+  }
+  .tap-label{font-size:0.85em;font-weight:600;letter-spacing:2px;color:var(--gray-l);text-transform:uppercase}
+  .intro-tap{position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;cursor:pointer;background:transparent}
+  .skip-btn{
+    position:absolute;bottom:28px;right:20px;z-index:10;
+    padding:10px 24px;
+    font-family:inherit;font-size:0.85em;font-weight:600;
+    letter-spacing:2px;text-transform:uppercase;
+    color:var(--white);background:rgba(0,0,0,0.55);
+    border:1.5px solid rgba(255,255,255,0.25);border-radius:24px;
+    cursor:pointer;backdrop-filter:blur(6px);
+    transition:all 0.3s;opacity:0;animation:fadeIn 0.5s 1.5s ease both;
+  }
+  .skip-btn:active{background:rgba(201,168,76,0.3);border-color:var(--gold);color:var(--gold)}
+
+  #startScreen{background:#000;align-items:center;justify-content:center;cursor:pointer}
+  .start-bg{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;object-position:center;background:#000;pointer-events:none}
+
+  #questionScreen{background:#000}
+  .q-full-bg{
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    object-fit:cover;object-position:center top;z-index:0;
+  }
+  .qh{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:min(2.5vh,18px) min(4vw,20px) min(2vh,14px);
+    position:relative;z-index:10;background:transparent;
+  }
+  .qh-left{display:flex;align-items:baseline;gap:min(3vw,18px)}
+  .qh-t{font-size:clamp(0.85em, min(2.5vw,2vh), 1.15em);font-weight:600;font-variant-numeric:tabular-nums}
+  .qh-c{font-size:clamp(0.85em, min(2.5vw,2vh), 1.15em);font-weight:500;color:var(--gray-l)}
+  .qh-logo{display:flex;align-items:flex-start;justify-content:flex-end}
+  .qh-logo img{
+    height:clamp(36px, min(10vw,12vh), 110px);width:auto;display:block;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,0.6));
+  }
+
+  .q-dark{
+    position:relative;z-index:5;flex:1;display:flex;flex-direction:column;
+    align-items:center;justify-content:flex-start;
+    padding:min(4vh,30px) min(5vw,24px) min(3vh,24px);margin-top:auto;
+  }
+  .q-dark::before{
+    content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.92);
+    clip-path:polygon(0% 8%, 14% 0%, 86% 0%, 100% 8%, 100% 100%, 0% 100%);
+    z-index:-1;pointer-events:none;
+  }
+  .q-gold-frame{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;pointer-events:none;overflow:hidden}
+  .q-gold-frame svg{position:absolute;top:0;left:0;width:100%;height:100%}
+  .q-txt{
+    font-size:clamp(0.78em, min(3vw,2.5vh), 1.25em);font-weight:500;text-align:center;
+    line-height:1.4;max-width:520px;
+    margin-bottom:min(2.5vh,20px);margin-top:min(1.5vh,10px);
+    animation:fadeInUp 0.4s ease both;
+  }
+  .q-answers{width:100%;max-width:520px;display:flex;flex-direction:column;flex:1;justify-content:space-evenly;gap:min(1vh,6px)}
+  .q-btn{
+    width:100%;padding:min(2.5vh,20px) min(4vw,24px);font-family:inherit;
+    font-size:clamp(0.7em, min(2.3vw,2vh), 1em);font-weight:500;color:var(--white);
+    background:rgba(20,20,20,0.8);border:1.5px solid var(--card-b);border-radius:40px;
+    cursor:pointer;transition:all 0.25s;text-align:center;line-height:1.3;backdrop-filter:blur(4px);
+  }
+  .q-btn:active:not(.done){border-color:var(--gold);background:rgba(40,40,40,0.9);transform:scale(0.98)}
+  .q-btn.done{cursor:default;pointer-events:none}
+  .q-btn.pick-ok{background:var(--beige-bg);border-color:var(--beige);color:#1a1400;font-weight:600;box-shadow:0 0 24px rgba(212,188,123,0.2)}
+  .q-btn.pick-bad{background:rgba(180,50,50,0.25);border-color:#b03232;color:#ff8888}
+  .q-btn.show-ok{background:rgba(212,188,123,0.15);border-color:var(--gold);color:var(--gold-l);opacity:0.8}
+  .q-btn.dim{opacity:0.3}
+
+  #resultScreen{background:#000;align-items:center;justify-content:center}
+  .result-bg{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;object-position:center;background:#000;pointer-events:none}
+  .result-overlay{
+    position:absolute;z-index:2;aspect-ratio:9/16;max-width:100%;max-height:100%;
+    top:50%;left:50%;transform:translate(-50%,-50%);
+  }
+  @supports (aspect-ratio:9/16){.result-overlay{height:100%}}
+
+  .r-cg{position:absolute;left:0;right:0;top:29%;text-align:center;font-size:clamp(1.1em, min(4.2vw,3.5vh), 2.2em);font-weight:700;font-style:italic}
+  .r-sub{position:absolute;left:0;right:0;top:34.5%;text-align:center;font-size:clamp(0.8em, min(2.4vw,2vh), 1.2em);color:var(--gray-l);font-weight:300;font-style:italic}
+  .r-sc{position:absolute;left:0;right:0;top:46.5%;text-align:center;font-size:clamp(2.5em, min(8.5vw,7vh), 5em);font-weight:900;line-height:1}
+  .r-tm{position:absolute;left:0;right:0;top:56.5%;text-align:center;font-size:clamp(1.2em, min(4.8vw,3.5vh), 2.6em);color:var(--white);font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:2px}
+  .btn-retry{
+    position:absolute;left:26.6%;right:26.6%;top:71.35%;height:6.51%;
+    display:flex;align-items:center;justify-content:center;font-family:inherit;
+    font-size:clamp(0.65em, min(2.2vw,1.8vh), 1.1em);font-weight:700;letter-spacing:3px;text-transform:uppercase;
+    color:var(--white);background:transparent;border:none;border-radius:999px;
+    cursor:pointer;transition:all 0.3s;padding:0;
+  }
+  .btn-retry:active{background:rgba(233,194,128,0.25)}
+
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(25px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes popIn{0%{opacity:0;transform:scale(0.6)}70%{transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+  @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:0.9}50%{transform:scale(1.08);opacity:1}}
+
+  @media (orientation:landscape){
+    .app{max-width:calc(100vh * 9 / 16)}
+    @supports(height:100dvh){.app{max-width:calc(100dvh * 9 / 16)}}
+    .start-bg{object-fit:contain}
+    .result-bg{object-fit:contain}
+    .intro-video{object-fit:contain}
+    .q-dark::before{clip-path:polygon(0% 10%, 10% 0%, 90% 0%, 100% 10%, 100% 100%, 0% 100%)}
+  }
+
+  @supports(padding:env(safe-area-inset-top)){
+    .qh{padding-top:calc(min(2.5vh,18px) + env(safe-area-inset-top))}
+    .skip-btn{bottom:calc(28px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right))}
+    .btn-retry{bottom:env(safe-area-inset-bottom)}
+  }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <div class="screen active" id="introScreen">
+    <video class="intro-video" id="introVideo" autoplay muted playsinline webkit-playsinline loop>
+      <source src="QUIZ START.mp4" type="video/mp4">
+    </video>
+    <div class="intro-tap" onclick="skipIntro()"></div>
+    <div class="tap-overlay hidden" id="tapOverlay" onclick="tapPlay()">
+      <div class="tap-play-icon"></div>
+      <div class="tap-label">Dotknij, aby odtworzy&#263;</div>
+    </div>
+    <button class="skip-btn" type="button" onclick="skipIntro()">POMI&#323; ></button>
+  </div>
+
+  <div class="screen" id="startScreen" onclick="startQuiz()">
+    <img class="start-bg" src="start_full.jpg" alt="">
+  </div>
+
+  <div class="screen" id="questionScreen">
+    <img class="q-full-bg" id="qBg" src="bg_q1.jpg" alt="">
+    <div class="qh">
+      <div class="qh-left">
+        <div class="qh-t" id="timer">00:00</div>
+        <div class="qh-c" id="qCounter">01/05</div>
+      </div>
+      <div class="qh-logo">
+        <img src="proplan_logo.png" alt="PRO PLAN LiveClear">
+      </div>
+    </div>
+    <div style="flex:1"></div>
+    <div class="q-dark" id="qDark">
+      <div class="q-gold-frame">
+        <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">
+          <path d="M0,80 L140,0 L860,0 L1000,80 L1000,1000 L0,1000 Z"
+                fill="none" stroke="rgba(180,155,70,0.45)" stroke-width="2"
+                vector-effect="non-scaling-stroke"/>
+        </svg>
+      </div>
+      <div class="q-txt" id="qText"></div>
+      <div class="q-answers" id="qGrid"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="resultScreen">
+    <img class="result-bg" src="wynik_full.jpg" alt="">
+    <div class="result-overlay">
+      <div class="r-cg" id="rCg">Gratulacje,</div>
+      <div class="r-sub">Tw&oacute;j wynik:</div>
+      <div class="r-sc" id="rSc">0/5</div>
+      <div class="r-tm" id="rTm">00:00</div>
+      <button class="btn-retry" onclick="resetQuiz()">SPR&Oacute;BUJ PONOWNIE</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var Q=[
+  {q:"Co daje codzienne podawanie Pro Plan\u00AE LiveClear?",
+   a:["Uczy kota \u015Bpiewa\u0107, ale tylko arie operowe","Zmian\u0119 koloru oczu kota","Redukcj\u0119 alergen\u00F3w na sier\u015Bci kota"],
+   ok:2,img:"bg_q4.jpg"},
+  {q:"Po jakim czasie mo\u017Cna zaobserwowa\u0107 redukcj\u0119 alergen\u00F3w przy regularnym podawaniu LiveClear?",
+   a:["Po pow\u0105chaniu karmy","Po up\u0142ywie 3 tygodni codziennego podawania karmy","Po 6 miesi\u0105cach"],
+   ok:1,img:"bg_q5.jpg"},
+  {q:"Jak nazywa si\u0119 g\u0142\u00F3wny koci alergen, kt\u00F3ry Pro Plan\u00AE LiveClear pomaga redukowa\u0107?",
+   a:["Witamina K","Fel d 1","Sier\u015B\u0107"],
+   ok:1,img:"bg_q1.jpg"},
+  {q:"Czy wszystkie koty produkuj\u0105 Fel d 1 i za co odpowiada?",
+   a:["Tak, a do tego Fel d 1 to g\u0142\u00F3wny alergen odpowiadaj\u0105cy za ok. 96% reakcji alergicznych u ludzi","Nie, tylko koty w paski","Koty nie produkuj\u0105 Fel d 1"],
+   ok:0,img:"bg_q2.jpg"},
+  {q:"Dlaczego alergen Fel d 1 utrzymuje si\u0119 na sier\u015Bci i nask\u00F3rku kota?",
+   a:["Bo kot produkuje alergen w swojej \u015Blinie i przenosi go podczas piel\u0119gnacji na swoj\u0105 sier\u015B\u0107","Bo sier\u015B\u0107 kota sama w sobie jest alergenem","Nie wiadomo"],
+   ok:0,img:"bg_q3.jpg"}
+];
+
+var cur=0,score=0,tiv=null,sec=0,locked=false;
+
+function tStart(){sec=0;tU();tiv=setInterval(function(){sec++;tU()},1000)}
+function tStop(){clearInterval(tiv)}
+function tU(){
+  var m=String(Math.floor(sec/60)).padStart(2,'0'),s=String(sec%60).padStart(2,'0');
+  document.getElementById('timer').textContent=m+':'+s;
+}
+function tS(){return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')}
+
+var cScr='introScreen';
+function goTo(id){
+  if(cScr===id)return;
+  var o=document.getElementById(cScr),n=document.getElementById(id);
+  o.classList.remove('active');o.classList.add('leaving');
+  setTimeout(function(){o.classList.remove('leaving');n.classList.add('active');cScr=id},420);
+}
+
+function skipIntro(){
+  var v=document.getElementById('introVideo');
+  if(v){try{v.pause()}catch(e){}}
+  goTo('startScreen');
+}
+function tapPlay(){
+  var v=document.getElementById('introVideo');
+  document.getElementById('tapOverlay').classList.add('hidden');
+  v.play().catch(function(){skipIntro()});
+}
+document.addEventListener('DOMContentLoaded',function(){
+  var v=document.getElementById('introVideo');
+  if(!v)return;
+  var p=v.play();
+  if(p!==undefined){p.catch(function(){document.getElementById('tapOverlay').classList.remove('hidden')})}
+});
+
+function startQuiz(){cur=0;score=0;goTo('questionScreen');tStart();setTimeout(renderQ,450)}
+
+function renderQ(){
+  locked=false;var q=Q[cur];
+  document.getElementById('qCounter').textContent=String(cur+1).padStart(2,'0')+'/'+String(Q.length).padStart(2,'0');
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('qBg').src=q.img;
+  var g=document.getElementById('qGrid');g.innerHTML='';
+  q.a.forEach(function(a,i){
+    var b=document.createElement('button');b.className='q-btn';b.textContent=a;
+    b.style.animation='slideUp 0.35s '+(i*0.08)+'s ease both';b.onclick=function(){pick(i)};g.appendChild(b);
+  });
+}
+
+function pick(idx){
+  if(locked)return;locked=true;
+  var q=Q[cur],bs=document.querySelectorAll('.q-btn'),ok=idx===q.ok;
+  bs.forEach(function(b,i){
+    b.classList.add('done');
+    if(i===idx)b.classList.add(ok?'pick-ok':'pick-bad');
+    else if(i===q.ok&&!ok)b.classList.add('show-ok');
+    else b.classList.add('dim');
+  });
+  if(ok)score++;
+  setTimeout(function(){cur++;if(cur<Q.length)renderQ();else{tStop();showRes()}},1300);
+}
+
+var idleTimer=null;
+function showRes(){
+  setTimeout(function(){
+    goTo('resultScreen');
+    setTimeout(function(){
+      var cg=document.getElementById('rCg');
+      if(score===Q.length)cg.textContent='Gratulacje,';
+      else if(score>=3)cg.textContent='Dobry wynik!';
+      else cg.textContent='Spr\u00F3buj ponownie!';
+      var el=document.getElementById('rSc');
+      el.textContent=score+'/'+Q.length;
+      el.style.animation='popIn 0.6s ease both';
+      document.getElementById('rTm').textContent=tS();
+      clearTimeout(idleTimer);
+      idleTimer=setTimeout(resetQuiz,60000);
+    },450);
+  },300);
+}
+
+function resetQuiz(){
+  clearTimeout(idleTimer);idleTimer=null;
+  document.getElementById('rSc').style.animation='none';
+  var v=document.getElementById('introVideo');
+  if(v){try{v.currentTime=0;v.play().catch(function(){})}catch(e){}}
+  goTo('introScreen');
+}
+
+document.body.addEventListener('touchmove', function(e){
+  if(!e.target.closest('.q-answers')) e.preventDefault();
+}, {passive:false});
+</script>
+</body>
+</html>
