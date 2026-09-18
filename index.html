@@ -159,7 +159,7 @@
   @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
   @keyframes pulse{0%,100%{transform:scale(1);opacity:0.9}50%{transform:scale(1.08);opacity:1}}
 
-  /* ===== LANDSCAPE â universal, all devices ===== */
+  /* ===== LANDSCAPE — universal, all devices ===== */
   @media (orientation:landscape){
     .app{max-width:calc(100vh * 9 / 16)}
     @supports(height:100dvh){.app{max-width:calc(100dvh * 9 / 16)}}
@@ -169,7 +169,7 @@
     .q-dark::before{clip-path:polygon(0% 10%, 10% 0%, 90% 0%, 100% 10%, 100% 100%, 0% 100%)}
   }
 
-  /* ===== Safe area â notch, Dynamic Island, rounded corners ===== */
+  /* ===== Safe area — notch, Dynamic Island, rounded corners ===== */
   @supports(padding:env(safe-area-inset-top)){
     .qh{padding-top:calc(min(2.5vh,18px) + env(safe-area-inset-top))}
     .skip-btn{bottom:calc(28px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right))}
@@ -236,20 +236,20 @@
 <script>
 /* ===== QUIZ DATA ===== */
 var Q=[
-  {q:"Co daje codzienne podawanie Pro PlanÂ® LiveClear?",
-   a:["Uczy kota ÅpiewaÄ, ale tylko arie operowe","ZmianÄ koloru oczu kota","RedukcjÄ alergenÃ³w na sierÅci kota"],
+  {q:"Co daje codzienne podawanie Pro Plan® LiveClear?",
+   a:["Uczy kota śpiewać, ale tylko arie operowe","Zmianę koloru oczu kota","Redukcję alergenów na sierści kota"],
    ok:2,img:"bg_q4.jpg"},
-  {q:"Po jakim czasie moÅ¼na zaobserwowaÄ redukcjÄ alergenÃ³w przy regularnym podawaniu LiveClear?",
-   a:["Po powÄchaniu karmy","Po upÅywie 3 tygodni codziennego podawania karmy","Po 6 miesiÄcach"],
+  {q:"Po jakim czasie można zaobserwować redukcję alergenów przy regularnym podawaniu LiveClear?",
+   a:["Po powąchaniu karmy","Po upływie 3 tygodni codziennego podawania karmy","Po 6 miesiącach"],
    ok:1,img:"bg_q5.jpg"},
-  {q:"Jak nazywa siÄ gÅÃ³wny koci alergen, ktÃ³ry Pro PlanÂ® LiveClear pomaga redukowaÄ?",
-   a:["Witamina K","Fel d 1","SierÅÄ"],
+  {q:"Jak nazywa się główny koci alergen, który Pro Plan® LiveClear pomaga redukować?",
+   a:["Witamina K","Fel d 1","Sierść"],
    ok:1,img:"bg_q1.jpg"},
-  {q:"Czy wszystkie koty produkujÄ Fel d 1 i za co odpowiada?",
-   a:["Tak, a do tego Fel d 1 to gÅÃ³wny alergen odpowiadajÄcy za ok. 96% reakcji alergicznych u ludzi","Nie, tylko koty w paski","Koty nie produkujÄ Fel d 1"],
+  {q:"Czy wszystkie koty produkują Fel d 1 i za co odpowiada?",
+   a:["Tak, a do tego Fel d 1 to główny alergen odpowiadający za ok. 96% reakcji alergicznych u ludzi","Nie, tylko koty w paski","Koty nie produkują Fel d 1"],
    ok:0,img:"bg_q2.jpg"},
-  {q:"Dlaczego alergen Fel d 1 utrzymuje siÄ na sierÅci i naskÃ³rku kota?",
-   a:["Bo kot produkuje alergen w swojej Ålinie i przenosi go podczas pielÄgnacji na swojÄ sierÅÄ","Bo sierÅÄ kota sama w sobie jest alergenem","Nie wiadomo"],
+  {q:"Dlaczego alergen Fel d 1 utrzymuje się na sierści i naskórku kota?",
+   a:["Bo kot produkuje alergen w swojej ślinie i przenosi go podczas pielęgnacji na swoją sierść","Bo sierść kota sama w sobie jest alergenem","Nie wiadomo"],
    ok:0,img:"bg_q3.jpg"}
 ];
 
@@ -323,7 +323,7 @@ function showRes(){
       var cg=document.getElementById('rCg');
       if(score===Q.length)cg.textContent='Gratulacje,';
       else if(score>=3)cg.textContent='Dobry wynik!';
-      else cg.textContent='SprÃ³buj ponownie!';
+      else cg.textContent='Spróbuj ponownie!';
       var el=document.getElementById('rSc');
       el.textContent=score+'/'+Q.length;
       el.style.animation='popIn 0.6s ease both';
