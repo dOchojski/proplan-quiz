@@ -91,7 +91,9 @@
   .qh-left{display:flex;align-items:baseline;gap:min(3vw,18px)}
   .qh-t{font-size:clamp(0.85em, min(2.5vw,2vh), 1.15em);font-weight:600;font-variant-numeric:tabular-nums}
   .qh-c{font-size:clamp(0.85em, min(2.5vw,2vh), 1.15em);font-weight:500;color:var(--gray-l)}
-  .qh-logo{display:flex;align-items:flex-start;justify-content:flex-end}
+  .qh-logo{
+    display:flex;align-items:flex-start;justify-content:flex-end;
+  }
   .qh-logo img{
     height:clamp(36px, min(10vw,12vh), 110px);width:auto;display:block;
     filter:drop-shadow(0 1px 2px rgba(0,0,0,0.6));
@@ -157,6 +159,7 @@
   @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
   @keyframes pulse{0%,100%{transform:scale(1);opacity:0.9}50%{transform:scale(1.08);opacity:1}}
 
+  /* ===== LANDSCAPE â universal, all devices ===== */
   @media (orientation:landscape){
     .app{max-width:calc(100vh * 9 / 16)}
     @supports(height:100dvh){.app{max-width:calc(100dvh * 9 / 16)}}
@@ -166,6 +169,7 @@
     .q-dark::before{clip-path:polygon(0% 10%, 10% 0%, 90% 0%, 100% 10%, 100% 100%, 0% 100%)}
   }
 
+  /* ===== Safe area â notch, Dynamic Island, rounded corners ===== */
   @supports(padding:env(safe-area-inset-top)){
     .qh{padding-top:calc(min(2.5vh,18px) + env(safe-area-inset-top))}
     .skip-btn{bottom:calc(28px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right))}
@@ -230,21 +234,22 @@
 </div>
 
 <script>
+/* ===== QUIZ DATA ===== */
 var Q=[
-  {q:"Co daje codzienne podawanie Pro Plan\u00AE LiveClear?",
-   a:["Uczy kota \u015Bpiewa\u0107, ale tylko arie operowe","Zmian\u0119 koloru oczu kota","Redukcj\u0119 alergen\u00F3w na sier\u015Bci kota"],
+  {q:"Co daje codzienne podawanie Pro PlanÂ® LiveClear?",
+   a:["Uczy kota ÅpiewaÄ, ale tylko arie operowe","ZmianÄ koloru oczu kota","RedukcjÄ alergenÃ³w na sierÅci kota"],
    ok:2,img:"bg_q4.jpg"},
-  {q:"Po jakim czasie mo\u017Cna zaobserwowa\u0107 redukcj\u0119 alergen\u00F3w przy regularnym podawaniu LiveClear?",
-   a:["Po pow\u0105chaniu karmy","Po up\u0142ywie 3 tygodni codziennego podawania karmy","Po 6 miesi\u0105cach"],
+  {q:"Po jakim czasie moÅ¼na zaobserwowaÄ redukcjÄ alergenÃ³w przy regularnym podawaniu LiveClear?",
+   a:["Po powÄchaniu karmy","Po upÅywie 3 tygodni codziennego podawania karmy","Po 6 miesiÄcach"],
    ok:1,img:"bg_q5.jpg"},
-  {q:"Jak nazywa si\u0119 g\u0142\u00F3wny koci alergen, kt\u00F3ry Pro Plan\u00AE LiveClear pomaga redukowa\u0107?",
-   a:["Witamina K","Fel d 1","Sier\u015B\u0107"],
+  {q:"Jak nazywa siÄ gÅÃ³wny koci alergen, ktÃ³ry Pro PlanÂ® LiveClear pomaga redukowaÄ?",
+   a:["Witamina K","Fel d 1","SierÅÄ"],
    ok:1,img:"bg_q1.jpg"},
-  {q:"Czy wszystkie koty produkuj\u0105 Fel d 1 i za co odpowiada?",
-   a:["Tak, a do tego Fel d 1 to g\u0142\u00F3wny alergen odpowiadaj\u0105cy za ok. 96% reakcji alergicznych u ludzi","Nie, tylko koty w paski","Koty nie produkuj\u0105 Fel d 1"],
+  {q:"Czy wszystkie koty produkujÄ Fel d 1 i za co odpowiada?",
+   a:["Tak, a do tego Fel d 1 to gÅÃ³wny alergen odpowiadajÄcy za ok. 96% reakcji alergicznych u ludzi","Nie, tylko koty w paski","Koty nie produkujÄ Fel d 1"],
    ok:0,img:"bg_q2.jpg"},
-  {q:"Dlaczego alergen Fel d 1 utrzymuje si\u0119 na sier\u015Bci i nask\u00F3rku kota?",
-   a:["Bo kot produkuje alergen w swojej \u015Blinie i przenosi go podczas piel\u0119gnacji na swoj\u0105 sier\u015B\u0107","Bo sier\u015B\u0107 kota sama w sobie jest alergenem","Nie wiadomo"],
+  {q:"Dlaczego alergen Fel d 1 utrzymuje siÄ na sierÅci i naskÃ³rku kota?",
+   a:["Bo kot produkuje alergen w swojej Ålinie i przenosi go podczas pielÄgnacji na swojÄ sierÅÄ","Bo sierÅÄ kota sama w sobie jest alergenem","Nie wiadomo"],
    ok:0,img:"bg_q3.jpg"}
 ];
 
@@ -318,7 +323,7 @@ function showRes(){
       var cg=document.getElementById('rCg');
       if(score===Q.length)cg.textContent='Gratulacje,';
       else if(score>=3)cg.textContent='Dobry wynik!';
-      else cg.textContent='Spr\u00F3buj ponownie!';
+      else cg.textContent='SprÃ³buj ponownie!';
       var el=document.getElementById('rSc');
       el.textContent=score+'/'+Q.length;
       el.style.animation='popIn 0.6s ease both';
@@ -337,6 +342,7 @@ function resetQuiz(){
   goTo('introScreen');
 }
 
+/* Blokuj scroll */
 document.body.addEventListener('touchmove', function(e){
   if(!e.target.closest('.q-answers')) e.preventDefault();
 }, {passive:false});
